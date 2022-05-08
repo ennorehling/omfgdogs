@@ -1,4 +1,3 @@
-local frame = 1
 local frames = {}
 local song
 local autoplay = true
@@ -33,12 +32,17 @@ function love.load()
     song:play()
 end
 
-function love.update()
-end
-
-local function advance(steps)
-    frame = frame + steps
-    if frame > #frames then frame = (frame - 1) % #frames + 1 end
+local speed = 40 -- ms per frame
+local frame = 1
+local delta = 0
+function advance(dt)
+    delta = delta + math.floor(dt * 1000)
+    if delta > speed then
+        local skip = math.floor(delta / speed)
+        delta = delta % speed
+        frame = frame + skip
+        if frame > #frames then frame = (frame - 1) % #frames + 1 end
+    end
 end
 
 function love.keypressed(key, scancode, isrepeat)
@@ -53,19 +57,25 @@ function love.keypressed(key, scancode, isrepeat)
             mute = not mute
             if mute then song:pause() else song:play() end
         end
-    elseif key == "right" then
-        advance(1)
-    elseif key == "left" then
-        advance(#frames -1)
     elseif key == "home" then
+        autoplay = false
         frame = 1
     elseif key == "end" then
+        autoplay = false
         frame = #frames
+    elseif key == "left" then
+        autoplay = false
+        frame = frame - 1
+        if frame == 0 then frame = #frames end
+    elseif key == "right" then
+        autoplay = false
+        frame = frame + 1
+        if frame > #frames then frame = 1 end
     end
 end
 
-function love.update()
-    if autoplay then advance(1) end
+function love.update(dt)
+    if autoplay then advance(dt) end
 end
 
 function love.draw()
@@ -83,8 +93,5 @@ function love.draw()
         end
         y = y + vh
     end
-    -- love.graphics.print("frame " .. frame, 0, 0)
+    love.graphics.print("frame " .. frame .. " delta " .. delta, 0, 0)
 end
--- 16128 okay
--- 16512 not okay
--- 16896 not
