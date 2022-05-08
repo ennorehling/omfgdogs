@@ -2,6 +2,7 @@ local frames = {}
 local song
 local autoplay = true
 local mute = false
+local full = false
 
 function add_frames(image, frames, width, height)
     local y = 0
@@ -42,6 +43,15 @@ function advance(dt)
         delta = delta % speed
         frame = frame + skip
         if frame > #frames then frame = (frame - 1) % #frames + 1 end
+    end
+end
+
+function love.keyreleased(key)
+    if key == "return" then
+        if love.keyboard.isScancodeDown("lalt", "ralt") then
+            full = not full
+            love.window.setMode(800, 600, {fullscreen=full})
+        end
     end
 end
 
