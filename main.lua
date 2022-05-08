@@ -25,6 +25,7 @@ function love.load()
     local width = 384
     local height = 80
     local image
+    love.window.setTitle("OMFGDOGS")
     image = love.graphics.newImage("spritesheet_left.png")
     add_frames(image, frames, width, height)
     image = love.graphics.newImage("spritesheet_right.png")
