@@ -30,8 +30,11 @@ function love.load()
     add_frames(image, frames, width, height)
     image = love.graphics.newImage("spritesheet_right.png")
     add_frames(image, frames, width, height)
-    song = love.audio.newSource("omfgdogs.mp3", "stream")
-    song:play()
+    local filename = "omfgdogs.mp3"
+    song = love.audio.newSource(filename, "stream")
+    if song then
+    	song:play()
+    end
 end
 
 local speed = 40 -- ms per frame
