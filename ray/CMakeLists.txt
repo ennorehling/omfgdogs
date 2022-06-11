@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23)
+cmake_minimum_required(VERSION 3.22)
 project(omfgdogs C)
 
 find_package(raylib)
@@ -11,8 +11,16 @@ add_executable(omfgdogs main.c)
 target_include_directories(omfgdogs PRIVATE ${RAYLIB_INCLUDE_DIR})
 target_link_libraries(omfgdogs ${RAYLIB_LIBRARY})
 
+if (WIN32)
+install(TARGETS omfgdogs)
+install(FILES
+ ${CMAKE_CURRENT_SOURCE_DIR}/../assets/omfgdogs.mp3
+ ${CMAKE_CURRENT_SOURCE_DIR}/../assets/omfgdogs.gif
+)
+else(WIN32)
 install(TARGETS omfgdogs DESTINATION bin)
 install(FILES
  ${CMAKE_CURRENT_SOURCE_DIR}/../assets/omfgdogs.mp3
  ${CMAKE_CURRENT_SOURCE_DIR}/../assets/omfgdogs.gif
  DESTINATION share/omfgdogs)
+endif(WIN32)

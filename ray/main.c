@@ -1,49 +1,80 @@
 #include "raylib.h"
 #include <stdlib.h>
+#include <string.h>
 
-const char * soundFiles[] = {
-    "omfgdogs.mp3",
-    "/usr/share/omfgdogs/omfgdogs.mp3",
-    "/usr/local/share/omfgdogs/omfgdogs.mp3",
-    "../assets/omfgdogs.mp3",
+#ifndef WIN32
+const char * searchPath[] = {
+    NULL,
+    "/usr/share/omfgdogs",
+    "/usr/local/share/omfgdogs",
     NULL
 };
-const char * imageFiles[] = {
-    "omfgdogs.gif",
-    "/usr/share/omfgdogs/omfgdogs.gif",
-    "/usr/local/share/omfgdogs/omfgdogs.gif",
-    "../assets/omfgdogs.gif",
-    NULL
-};
+#endif
+
+#ifndef DIRECTORY_SEPARATOR
+#ifdef WIN32
+#define DIRECTORY_SEPARATOR '\\'
+#else
+#define DIRECTORY_SEPARATOR '/'
+#endif
+#endif
+
+char * TextDuplicate(const char *text)
+{
+#ifdef WIN32
+    char * result = _strdup(text);
+#else
+    char * result = strdup(text);
+#endif
+    return result;
+}
 
 int main(void)
 {
     const int screenWidth = 800;
     const int screenHeight = 450;
     InitAudioDevice();
-    const char * soundFile = NULL;
-    const char * imageFile = NULL;
-    for (int i = 0; soundFiles[i]; ++i) {
-        if (FileExists(soundFiles[i])) {
-            soundFile = soundFiles[i];
-            imageFile = imageFiles[i];
-            break;
+
+    const char *parts[2];
+    char delim[2] = { DIRECROTY_SEPARATOR, 0 };
+    searchPath[0] = GetApplicationDirectory();
+
+    int frames = 0;
+    Sound song = { 0 };
+    Image sprites = { 0 };
+    for (int i = 0; searchPath[i]; ++i) {
+        const char * filename;
+        parts[0] = searchPath[i];
+        if (!song.frameCount) {
+            parts[1] = "omfgdogs.mp3";
+            filename = TextJoin(parts, 2, delim);
+            if (FileExists(filename)) {
+                song = LoadSound(filename);
+            }
+        }
+        if (frames == 0) {
+            parts[1] = "omfgdogs.gif";
+            filename = TextJoin(parts, 2, delim);
+            if (FileExists(filename)) {
+                sprites = LoadImageAnim(filename, &frames);
+            }
         }
     }
-    if (!soundFile || !imageFile) {
-        TraceLog(LOG_ERROR, "required assets not found");
-        return -1;
+    if (!song.frameCount) {
+        TraceLog(LOG_WARNING, "music not found");
     }
-    Sound song = LoadSound(soundFile);
-    int frames, frame = 0;
-    Image sprites = LoadImageAnim(imageFile, &frames);
+    if (frames == 0) {
+        TraceLog(LOG_FATAL, "spritesheet not found");
+    }
     InitWindow(screenWidth, screenHeight, "raylib [shapes] example - colors palette");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
-    PlaySound(song);
-
+    if (song.frameCount) {
+        PlaySound(song);
+    }
     Texture2D *textures = malloc(frames * sizeof(Texture2D));
     Image image = sprites;
     unsigned int frameOffset = sprites.width*sprites.height*4;
+    int frame = 0;
     for (int i = 0; i != frames; ++i) {
         image.data = ((unsigned char *)sprites.data) + i * frameOffset;
         textures[i] = LoadTextureFromImage(image);
@@ -78,9 +109,11 @@ int main(void)
         }
         if (IsKeyPressed(KEY_F)) ToggleFullscreen();
         if (IsKeyPressed(KEY_M)) {
-            mute = !mute;
-            if (mute) PauseSound(song);
-            else ResumeSound(song);
+            if (song.frameCount) {
+                mute = !mute;
+                if (mute) PauseSound(song);
+                else ResumeSound(song);
+            }
         }
     }
 
@@ -88,7 +121,9 @@ int main(void)
     {
         UnloadTexture(textures[i]);
     }
-    StopSound(song);
+    if (song.frameCount) {
+        StopSound(song);
+    }
     CloseAudioDevice();
     CloseWindow();                // Close window and OpenGL context
 
