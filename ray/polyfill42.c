@@ -1,5 +1,6 @@
 #include "raylib.h"
 #include "polyfill42.h"
+#include <string.h>
 
 // Platform specific defines to handle GetApplicationDirectory()
 #if defined (PLATFORM_DESKTOP)

@@ -1,16 +1,16 @@
 #include "raylib.h"
-#include <stdlib.h>
-#include <string.h>
-
-#ifdef RAYLIB
-#if RAYLIB < 4200
+#ifdef RAYLIBVER
+#if RAYLIBVER < 4200
 #include "polyfill42.h"
 #endif
 #endif
 
+#include <stdlib.h>
+#include <string.h>
+
 const char * searchPath[] = {
     NULL,
-#ifndef WIN32
+#ifdef WIN32
     "..\\assets",
 #else
     "../assets",
