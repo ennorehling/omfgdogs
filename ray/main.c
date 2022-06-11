@@ -2,14 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef WIN32
+#ifdef RAYLIB
+#if RAYLIB < 4200
+#include "polyfill42.h"
+#endif
+#endif
+
 const char * searchPath[] = {
     NULL,
+#ifndef WIN32
+    "..\\assets",
+#else
+    "../assets",
     "/usr/share/omfgdogs",
     "/usr/local/share/omfgdogs",
+#endif
     NULL
 };
-#endif
 
 #ifndef DIRECTORY_SEPARATOR
 #ifdef WIN32
@@ -29,14 +38,14 @@ char * TextDuplicate(const char *text)
     return result;
 }
 
-int main(void)
+int main()
 {
     const int screenWidth = 800;
     const int screenHeight = 450;
     InitAudioDevice();
 
     const char *parts[2];
-    char delim[2] = { DIRECROTY_SEPARATOR, 0 };
+    char delim[2] = { DIRECTORY_SEPARATOR, 0 };
     searchPath[0] = GetApplicationDirectory();
 
     int frames = 0;
