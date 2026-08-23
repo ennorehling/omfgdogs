@@ -2,27 +2,38 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
-// #include <SDL3/SDL_image.h>
+#include <SDL3_image/SDL_image.h>
+#include <SDL3_mixer/SDL_mixer.h>
 
 struct AppContext {
     SDL_Window* window;
     SDL_Renderer* renderer;
-    // IMG_Animation *animation;
-    // MIX_Audio* audio;
+    IMG_Animation *animation;
+    SDL_Texture **textures;
+    MIX_Audio* audio;
     SDL_FRect mouseposrect;
 };
 
 SDL_AppResult SDL_AppIterate(void *appstate)
 {
     struct AppContext *app = (struct AppContext *)appstate;
-    Uint8 r;
-
-    /* fade between shades of red every 3 seconds, from 0 to 255. */
-    r = (Uint8) ((((float) (SDL_GetTicks() % 3000)) / 3000.0f) * 255.0f);
-    SDL_SetRenderDrawColor(app->renderer, r, 0, 0, 255);
-
-    /* you have to draw the whole window every frame. Clearing it makes sure the whole thing is sane. */
-    SDL_RenderClear(app->renderer);  /* clear whole window to that fade color. */
+    /* draw image, loop animation every 3 seconds */
+    int w, h;
+    if (SDL_GetRenderOutputSize(app->renderer, &w, &h)) {
+        Uint8 frame = (Uint8) ((((float) (SDL_GetTicks() % 3000)) / 3000.0f) * app->animation->count);
+        SDL_Texture *texture = app->textures[frame];
+        SDL_FRect dstrect = {
+            .x = 0.0f,
+            .y = 0.0f,
+            .w = texture->w,
+            .h = texture->h
+        };
+        for (dstrect.y = .0f; dstrect.y < h; dstrect.y += dstrect.h) {
+            for (dstrect.x = .0f; dstrect.x < w; dstrect.x += dstrect.w) {
+                SDL_RenderTexture(app->renderer, texture, NULL, &dstrect);
+            }
+        }
+    }
 
     /* set the color to white */
     SDL_SetRenderDrawColor(app->renderer, 255, 255, 255, 255);
@@ -63,14 +74,14 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     SDL_Window *window;
     SDL_Renderer *renderer;
 
-    SDL_SetAppMetadata("SDL Hello World Example", "1.0", "com.example.sdl-hello-world");
+    SDL_SetAppMetadata("SDL omfgdogs Example", "1.0", "com.example.sdl-omfgdogs");
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL_Init(SDL_INIT_VIDEO) failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
 
-    if (!SDL_CreateWindowAndRenderer("Hello SDL", 640, 480, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
+    if (!SDL_CreateWindowAndRenderer("Hello SDL", 800, 450, SDL_WINDOW_RESIZABLE, &window, &renderer)) {
         SDL_Log("SDL_CreateWindowAndRenderer() failed: %s", SDL_GetError());
         return SDL_APP_FAILURE;
     }
@@ -84,6 +95,17 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
     app->mouseposrect.w = app->mouseposrect.h = 50;
     app->window = window;
     app->renderer = renderer;
+    app->textures = NULL;
+    app->animation = IMG_LoadAnimation("omfgdogs.gif");
+    if (!app->animation) {
+        SDL_Log("IMG_LoadAnimation() failed: %s", SDL_GetError());
+        return SDL_APP_FAILURE;
+    }
+    app->textures = SDL_malloc(sizeof(SDL_Texture *) * app->animation->count);
+    for (int f=0; f!=app->animation->count;++f) {
+        SDL_Surface *surface = app->animation->frames[f];
+        app->textures[f] = SDL_CreateTextureFromSurface(app->renderer, surface);
+    }
 
     *appstate = app;
     return SDL_APP_CONTINUE;
@@ -92,6 +114,11 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[])
 void SDL_AppQuit(void *appstate, SDL_AppResult result)
 {
     struct AppContext *app = (struct AppContext *)appstate;
+    for (int f=0;f!=app->animation->count;++f) {
+        SDL_DestroyTexture(app->textures[f]);
+    }
+    SDL_free(app->textures);
+    IMG_FreeAnimation(app->animation);
     SDL_DestroyRenderer(app->renderer);
     SDL_DestroyWindow(app->window);
     SDL_free(app);
