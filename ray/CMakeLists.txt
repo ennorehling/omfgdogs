@@ -1,11 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(omfgdogs C)
 
-find_package(raylib 4.0 REQUIRED)
-if (raylib_FOUND)
-set(RAYLIB_INCLUDE_DIR ${raylib_INCLUDE_DIR})
-set(RAYLIB_LIBRARY ${raylib_LIBRARY})
-endif(raylib_FOUND)
+find_package(raylib CONFIG REQUIRED)
 
 include(CheckFunctionExists)
 CHECK_FUNCTION_EXISTS(GetApplicationDirectory RAYLIB42)
@@ -27,8 +23,7 @@ endif(MSVC)
 
 target_compile_definitions(${EXECUTABLE_NAME} PRIVATE RAYLIBVER=${RAYLIB_VERSION})
 target_compile_definitions(${EXECUTABLE_NAME} PRIVATE -DPLATFORM_DESKTOP)
-target_include_directories(${EXECUTABLE_NAME} PRIVATE ${RAYLIB_INCLUDE_DIR})
-target_link_libraries(${EXECUTABLE_NAME} ${RAYLIB_LIBRARY})
+target_link_libraries(${EXECUTABLE_NAME} raylib)
 
 if (WIN32)
 install(TARGETS ${EXECUTABLE_NAME})

@@ -1,8 +1,8 @@
 #!/bin/sh
-mkdir -p out
-cp ../assets/omfgdogs.mp3 out/
-cp *.png out/
-cp *.lua out/
-cd out
+mkdir -p build
+cp ../assets/omfgdogs.mp3 build/
+cp *.png build/
+cp *.lua build/
+cd build
 zip -r ../omfgdogs.love .
 cd ..
