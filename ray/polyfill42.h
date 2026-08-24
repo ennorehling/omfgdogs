@@ -6,6 +6,7 @@
 #define MAX_FILEPATH_LENGTH      512        // Maximum length supported for filepaths
 #endif
 
+char *TextJoinEx(const char * textList[], int count, const char *delimiter);
 #ifdef PLATFORM_DESKTOP
 const char* GetApplicationDirectory(void);
 #endif

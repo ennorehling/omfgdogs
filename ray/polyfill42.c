@@ -1,6 +1,11 @@
-#include "raylib.h"
+#include <raylib.h>
 #include "polyfill42.h"
 #include <string.h>
+
+char *TextJoinEx(const char * textList[], int count, const char *delimiter)
+{
+    return TextJoin((char **)textList, count, delimiter);
+}
 
 // Platform specific defines to handle GetApplicationDirectory()
 #if defined (PLATFORM_DESKTOP)

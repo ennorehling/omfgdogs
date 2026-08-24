@@ -1,4 +1,4 @@
-#include "raylib.h"
+#include <raylib.h>
 #ifdef RAYLIBVER
 #if RAYLIBVER < 4200
 #include "polyfill42.h"
@@ -56,14 +56,14 @@ int main()
         parts[0] = searchPath[i];
         if (!song.frameCount) {
             parts[1] = "omfgdogs.mp3";
-            filename = TextJoin(parts, 2, delim);
+            filename = TextJoinEx(parts, 2, delim);
             if (FileExists(filename)) {
                 song = LoadSound(filename);
             }
         }
         if (frames == 0) {
             parts[1] = "omfgdogs.gif";
-            filename = TextJoin(parts, 2, delim);
+            filename = TextJoinEx(parts, 2, delim);
             if (FileExists(filename)) {
                 sprites = LoadImageAnim(filename, &frames);
             }
