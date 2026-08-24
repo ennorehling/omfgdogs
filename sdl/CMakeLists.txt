@@ -4,11 +4,13 @@ set(CMAKE_C_STANDARD_REQUIRED 11)
 set(CMAKE_C_STANDARD 11)
 find_package(SDL3 REQUIRED CONFIG REQUIRED COMPONENTS SDL3-shared)
 find_package(SDL3_image REQUIRED)
+find_package(SDL3_mixer REQUIRED)
 
 add_executable(omfgdogs main.c)
 target_link_libraries(omfgdogs PRIVATE
     SDL3::SDL3
     SDL3_image::SDL3_image
+    SDL3_mixer::SDL3_mixer
 )
 
 install(TARGETS omfgdogs DESTINATION bin)
