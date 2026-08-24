@@ -7,6 +7,4 @@
 #endif
 
 char *TextJoinEx(const char * textList[], int count, const char *delimiter);
-#ifdef PLATFORM_DESKTOP
 const char* GetApplicationDirectory(void);
-#endif

@@ -8,7 +8,6 @@ char *TextJoinEx(const char * textList[], int count, const char *delimiter)
 }
 
 // Platform specific defines to handle GetApplicationDirectory()
-#if defined (PLATFORM_DESKTOP)
 #if defined(_WIN32)
 #ifndef MAX_PATH
 #define MAX_PATH 1025
@@ -98,4 +97,3 @@ const char* GetApplicationDirectory(void)
 
     return appDir;
 }
-#endif // PLATFORM_DESKTOP

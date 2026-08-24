@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(omfgdogs C)
+project(omfgdogs-ray C)
 
 find_package(raylib CONFIG REQUIRED)
 
@@ -22,7 +22,6 @@ set_target_properties(${EXECUTABLE_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif(MSVC)
 
 target_compile_definitions(${EXECUTABLE_NAME} PRIVATE RAYLIBVER=${RAYLIB_VERSION})
-target_compile_definitions(${EXECUTABLE_NAME} PRIVATE -DPLATFORM_DESKTOP)
 target_link_libraries(${EXECUTABLE_NAME} raylib)
 
 if (WIN32)
