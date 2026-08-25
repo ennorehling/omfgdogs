@@ -83,13 +83,15 @@ SDL_IOStream *OpenAsset(const char *asset) {
         "", NULL
     };
     char filename[1024];
-    for (int i = lastMatch; paths[i]; ++i) {
+    for (int i = lastMatch; ; ) {
+        if (!paths[i]) i = 0;
         snprintf(filename, sizeof(filename), "%s%s", paths[i], asset);
         SDL_IOStream *io = SDL_IOFromFile(filename, "rw");
         if (io) {
             lastMatch = i;
             return io;
         }
+        if (++i==lastMatch) break;
     }
     SDL_Log("OpenAsset() failed: Couldn't find %s", asset);
     return NULL;
