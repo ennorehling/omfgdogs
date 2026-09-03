@@ -75,8 +75,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event)
 SDL_IOStream *OpenAsset(const char *asset) {
     static int lastMatch = 0;
     const char * paths[] = {
-        "/usr/share/omfgdogs/",
         "/usr/local/share/omfgdogs/",
+        "/usr/share/omfgdogs/",
         "assets/",
         "../assets/",
         "../../assets/",
